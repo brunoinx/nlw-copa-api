@@ -1,24 +1,24 @@
-import { FastifyInstance } from "fastify";
-import ShortUniqueId from "short-unique-id";
-import { z } from "zod";
+import { FastifyInstance } from 'fastify';
+import ShortUniqueId from 'short-unique-id';
+import { z } from 'zod';
 
-import { prisma } from "../lib/prisma";
-import { authenticate } from "../plugins/authenticate";
+import { prisma } from '../lib/prisma';
+import { authenticate } from '../plugins/authenticate';
 
 export async function poolRoutes(fastify: FastifyInstance) {
-  fastify.get("/pools/count", async () => {
+  fastify.get('/pools/count', async () => {
     const count = await prisma.pool.count();
 
     return { count };
   });
 
-  fastify.post("/pools", async (request, reply) => {
+  fastify.post('/pools', async (request, reply) => {
     const createPoolSchema = z.object({
       title: z
         .string({
-          required_error: "O titulo é obrigatório",
+          required_error: 'O titulo é obrigatório',
         })
-        .min(3, { message: "Precisa ter pelo menos três caracteres." }),
+        .min(3, { message: 'Precisa ter pelo menos três caracteres.' }),
     });
 
     const { title } = createPoolSchema.parse(request.body);
@@ -38,9 +38,9 @@ export async function poolRoutes(fastify: FastifyInstance) {
 
           participants: {
             create: {
-              userId: request.user.sub
-            }
-          }
+              userId: request.user.sub,
+            },
+          },
         },
       });
     } catch {
@@ -54,4 +54,18 @@ export async function poolRoutes(fastify: FastifyInstance) {
 
     return reply.status(201).send({ code });
   });
+
+  fastify.post(
+    '/pools/:id/join',
+    {
+      onRequest: [authenticate],
+    },
+    async (request, reply) => {
+      const joinPoolBody = z.object({
+        code: z.string(),
+      });
+
+      const { code } = joinPoolBody.parse(request.body);
+    },
+  );
 }

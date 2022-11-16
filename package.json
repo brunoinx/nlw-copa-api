@@ -5,7 +5,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "prisma:erd": "npx prisma generate"
+    "prisma:erd": "npx prisma generate",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
+    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
